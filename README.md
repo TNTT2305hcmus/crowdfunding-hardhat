@@ -21,7 +21,9 @@ A decentralized crowdfunding platform built with Solidity and Hardhat, applying 
    ```bash
    npm install
 2. Start local blockchain node:
+    ```bash
    npx hardhat node
-3. Run the full DeFi simulation flow:
+4. Run the full DeFi simulation flow:
+   ```bash
    npx hardhat run scripts/defi_flow.js --network localhost
 
