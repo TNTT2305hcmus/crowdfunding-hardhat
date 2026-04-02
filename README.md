@@ -1,18 +1,27 @@
-<<<<<<< HEAD
-# crowdfunding-hardhat
-A small project to practice Solidity, Hardhat &amp; ether.js
-=======
-# Sample Hardhat Project
+# 🚀 Decentralized Kickstarter (Web3 Crowdfunding)
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a Hardhat Ignition module that deploys that contract.
+A decentralized crowdfunding platform built with Solidity and Hardhat, applying DeFi concepts and Design Patterns.
 
-Try running some of the following tasks:
+## 🌟 Key Features (Level 2 Completed)
+- **Factory Pattern:** Automatically deploy new crowdfunding campaigns (`CrowdFundFactory.sol`).
+- **ERC20 Integration:** Accept funding in Stablecoins/Tokens (Mock USD) instead of volatile native ETH.
+- **DeFi Flow:** Implemented standard ERC20 `approve` and `transferFrom` mechanics for secure pledges.
+- **Security:** Built-in safeguards against reentrancy and deadline manipulation.
+- **Unit Testing:** Comprehensive test coverage using Hardhat, Chai, and Ethers.js (Time manipulation included).
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat ignition deploy ./ignition/modules/Lock.js
-```
->>>>>>> origin/master
+## 🛠 Tech Stack
+- Solidity ^0.8.26
+- Hardhat (Development Environment)
+- Ethers.js v6
+- OpenZeppelin Contracts (ERC20 standard)
+
+## 🏃‍♂️ How to Run Locally
+
+1. Install dependencies:
+   ```bash
+   npm install
+2. Start local blockchain node:
+   npx hardhat node
+3. Run the full DeFi simulation flow:
+   npx hardhat run scripts/defi_flow.js --network localhost
+

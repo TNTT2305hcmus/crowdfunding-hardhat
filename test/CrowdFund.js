@@ -40,6 +40,9 @@ describe("CrowdFund Smart Contract", function(){
         it("Should fail if goal is 0", async function () {
             // Đây là bài tập nhỏ: Logic này chưa xử lý trong Contract.
             // Bạn cứ chạy test để xem nó hoạt động thế nào đã.
+            const { crowdFund} = await loadFixture(deployCrowdFundFixture);
+            expect(await crowdFund.goal().to.equal(0))
+            .to.be.revertedWith("GOAL must be > 0");
         });
     });
 
