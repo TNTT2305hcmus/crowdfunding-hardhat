@@ -2,6 +2,7 @@
 pragma solidity ^0.8.26;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./RewardNFT.sol";
 
 contract CrowdFund {
     event Launch(uint id, address indexed creator, uint goal, uint startAt, uint endAt);
@@ -11,15 +12,20 @@ contract CrowdFund {
     address public manager;
     uint public goal;
     uint public deadline;
+    mapping(address => uint) public pledged;
     // uint public pledgeAmount;
     IERC20 public token;
-    mapping(address => uint) public pledged;
+    RewardNFT public nftReward;
+    uint public constant NFT_TIER = 100 * 10**18;
+    mapping(address => bool) public hasClaimedNFT;
 
     constructor(address _manager, uint _goal, uint _duration, address _token) {
         manager = _manager;
         goal = _goal;
         deadline = block.timestamp + _duration;
         token = IERC20(_token);
+        // Automatic deploy contract RewardNFT
+        nftReward = new RewardNFT("Campain VIP Badge", "CBG", address(this));
         emit Launch( 1, manager, goal, block.timestamp, deadline);
     }
 
@@ -79,6 +85,11 @@ contract CrowdFund {
         // Lấy tiền từ ví người dùng
         token.transferFrom(msg.sender, address(this), _amount);
         pledged[msg.sender] += _amount;
+        // Cấp NFT khi quyên góp vượt NFT_TIER
+        if(pledged[msg.sender] >= NFT_TIER && !hasClaimedNFT[msg.sender]){
+            nftReward.mint(msg.sender);
+            hasClaimedNFT[msg.sender] = true;
+        }
         emit Pledge(msg.sender, _amount);
     }
 

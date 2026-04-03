@@ -78,6 +78,19 @@ async function main() {
     const managerBalance = await mockToken.balanceOf(deployer.address);
     console.log(`   Manager's Token Balance: ${hre.ethers.formatEther(managerBalance)} mUSD`);
     
+    // --- KIỂM TRA NFT ---
+    console.log("\n CHECKING NFT REWARDS...");
+    const nftAddress = await campaign.nftReward();
+    const nftContract = await hre.ethers.getContractAt("RewardNFT", nftAddress);
+    
+    const user1NFTs = await nftContract.balanceOf(user1.address);
+    const user2NFTs = await nftContract.balanceOf(user2.address);
+    
+    console.log(`   User 1 NFT Balance: ${user1NFTs} Badge(s)`); // User 1 góp 300 -> 1 NFT
+    console.log(`   User 2 NFT Balance: ${user2NFTs} Badge(s)`); // User 2 góp 400 -> 1 NFT
+
+
+
     console.log("==================================================");
     console.log("SIMULATION COMPLETED SUCCESSFULLY!");
 }
