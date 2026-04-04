@@ -19,6 +19,24 @@ contract CrowdFund {
     uint public constant NFT_TIER = 100 * 10**18;
     mapping(address => bool) public hasClaimedNFT;
 
+    // Phát triển hệ thống DAO Voting
+    struct Request {
+        string description; // Lý do rút tiền
+        uint value;         // Số tiền muốn rút
+        address recipient;  // Địa chỉ người nhận 
+        bool complete;      // Đã giải ngân
+        uint approvalCount; // Số phiểu đồng ý hiện tại
+    }
+
+    // Danh sách yêu cầu rút tiền
+    Request[] public requests;
+
+    // Lưu trữ xem ai đã vote cho request nào
+    mapping(uint => mapping(address => bool)) public approvals;
+
+    // Tổng số người đã góp tiền
+    uint public contributorsCount;
+
     constructor(address _manager, uint _goal, uint _duration, address _token) {
         manager = _manager;
         goal = _goal;
@@ -82,6 +100,11 @@ contract CrowdFund {
     function pledge(uint _amount) external {
         require(block.timestamp < deadline, "Deadline passed");
         require(_amount > 0, "Amount must be > 0");
+
+        if(pledged[msg.sender] == 0){
+            contributorsCount++;
+        }
+
         // Lấy tiền từ ví người dùng
         token.transferFrom(msg.sender, address(this), _amount);
         pledged[msg.sender] += _amount;
@@ -99,6 +122,36 @@ contract CrowdFund {
         uint amountToRefund = pledged[msg.sender];
         pledged[msg.sender] = 0;
         token.transfer(msg.sender, amountToRefund);
+    }
+
+    function createRequest(string memory _description, uint _value, address _recipient) external onlyManager {
+        Request memory newRequest = Request({
+            description: _description,
+            value: _value,
+            recipient: _recipient,
+            complete: false,
+            approvalCount: 0
+        });
+        requests.push(newRequest);
+    }
+
+    function approveRequest(uint _requestId) public {
+        require(pledged[msg.sender] > 0, "Caller must be contributor");
+        require(approvals[_requestId][msg.sender] == false, "Caller already voted");
+
+        requests[_requestId].approvalCount++;
+        approvals[_requestId][msg.sender] = true;
+    }
+
+    function finalizeRequest(uint _requestId) external onlyManager {
+        Request storage request = requests[_requestId];
+
+        require(!request.complete, "Request already completed");
+        require(request.approvalCount > (contributorsCount / 2), "Not enough approvals");
+
+        // Đánh dấu hoàn thành trước khi chuyển tiền (Chống Reentrancy)
+        request.complete = true;
+        token.transfer(request.recipient, request.value);
     }
 
 }
