@@ -2,7 +2,7 @@
 
 A decentralized crowdfunding platform built with Solidity and Hardhat, applying DeFi concepts and Design Patterns.
 
-## 🌟 Key Features (Level 4 Completed)
+## 🌟 Key Features
 
 - **Factory Pattern:** Automatically deploy isolated crowdfunding campaigns via `CrowdFundFactory.sol`, allowing multiple projects to run simultaneously.
 - **DeFi Flow (ERC20):** Accept funding in Stablecoins (Mock USD) to prevent extreme price volatility, utilizing standard `approve` and `transferFrom` mechanics.
@@ -10,7 +10,8 @@ A decentralized crowdfunding platform built with Solidity and Hardhat, applying 
   - Automatically mints and sends a "Campaign VIP Badge" (NFT) directly to the wallets of users who pledge 100 mUSD or more.
   - Fully on-chain automated distribution.
 - **Security:** Built-in safeguards against reentrancy, timeline manipulation, and unauthorized minting (Ownable standard).
-- **DAO Voting**: Require manager give a request when wanting to withdraw, it's only accepted when 1/2 contributors approve.
+- **DAO Voting:** Require manager give a request when wanting to withdraw, it's only accepted when 1/2 contributors approve.
+- **Security Standards:** Add RentrancyGuard and Pausable in CrowdFund
 
 ## 🛠 Tech Stack
 - **Smart Contracts:** Solidity ^0.8.26
