@@ -4,7 +4,11 @@ pragma solidity ^0.8.26;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./RewardNFT.sol";
 
-contract CrowdFund {
+// Trang bị ReentrancyGuard và Pausable
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
+
+contract CrowdFund is ReentrancyGuard, Pausable {
     event Launch(uint id, address indexed creator, uint goal, uint startAt, uint endAt);
     event Pledge(address indexed caller, uint amount);
     event Refund(address indexed caller, uint amount);
@@ -88,7 +92,7 @@ contract CrowdFund {
 
     // Phase 2: Quyên góp bằng ERC20 (Stable coin)
 
-    function withdraw() external onlyManager {
+    function withdraw() external onlyManager nonReentrant {
         require(block.timestamp >= deadline, "Not finished");
         // Kiểm tra số dư thực tế của contract
         require(token.balanceOf(address(this)) >= goal, "Goal not met");
@@ -97,7 +101,7 @@ contract CrowdFund {
 
     // Không nhận ETH nữa nên bỏ đi payable
     // Thêm _amount vì không có msg.value nên user phải truyền vào họ muốn đóng góp bao nhiêu
-    function pledge(uint _amount) external {
+    function pledge(uint _amount) external whenNotPaused {
         require(block.timestamp < deadline, "Deadline passed");
         require(_amount > 0, "Amount must be > 0");
 
@@ -116,7 +120,7 @@ contract CrowdFund {
         emit Pledge(msg.sender, _amount);
     }
 
-    function refund() external {
+    function refund() external nonReentrant {
         require(block.timestamp >= deadline, "Not finished");
         require(token.balanceOf(address(this)) < goal, "Goal met, cannot refund");
         uint amountToRefund = pledged[msg.sender];
@@ -124,7 +128,7 @@ contract CrowdFund {
         token.transfer(msg.sender, amountToRefund);
     }
 
-    function createRequest(string memory _description, uint _value, address _recipient) external onlyManager {
+    function createRequest(string memory _description, uint _value, address _recipient) external onlyManager whenNotPaused {
         Request memory newRequest = Request({
             description: _description,
             value: _value,
@@ -143,7 +147,7 @@ contract CrowdFund {
         approvals[_requestId][msg.sender] = true;
     }
 
-    function finalizeRequest(uint _requestId) external onlyManager {
+    function finalizeRequest(uint _requestId) external onlyManager nonReentrant {
         Request storage request = requests[_requestId];
 
         require(!request.complete, "Request already completed");
@@ -152,6 +156,14 @@ contract CrowdFund {
         // Đánh dấu hoàn thành trước khi chuyển tiền (Chống Reentrancy)
         request.complete = true;
         token.transfer(request.recipient, request.value);
+    }
+
+    function togglePause() external onlyManager {
+        if(paused()){
+            _unpause();
+        } else {
+            _pause();
+        }
     }
 
 }
