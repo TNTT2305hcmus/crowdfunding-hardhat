@@ -1,0 +1,11 @@
+{
+  "name": "Campaign VIP Badge",
+  "description": "Exclusive badge for top contributors who pledged over 100 mUSD.",
+  "image": "ipfs://bafkreieod6bcioc3j4t2qlzrrtkmoxqciclwpho6awzptmtjuq4nb4kg4e",
+  "attributes": [
+    {
+      "trait_type": "Tier",
+      "value": "Gold"
+    }
+  ]
+}
